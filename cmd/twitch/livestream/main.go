@@ -10,6 +10,8 @@ import (
 	"regexp"
 	s "strings"
 	"test.com/m/internal/database"
+	"time"
+	"github.com/joho/godotenv"
 )
 
 func parseUserName(twitchMessage string) string {
@@ -28,6 +30,7 @@ func parseMessage(twitchMessage string) string {
 }
 
 func createWebSocketClient() *websocket.Conn {
+	log.Print("Creating websocket client")
 	u := url.URL{Scheme: "wss", Host: "irc-ws.chat.twitch.tv:443"}
 	log.Printf("connecting to %s", u.String())
 
@@ -39,6 +42,7 @@ func createWebSocketClient() *websocket.Conn {
 }
 
 func authenticateClient(connection *websocket.Conn, twitchChannel string) {
+	log.Print("authenticating websocket client")
 	oauth := fmt.Sprintf("PASS %s", os.Getenv("twitchAuth"))
 	username := fmt.Sprintf("NICK %s", os.Getenv("twitchUsername"))
 
@@ -57,15 +61,27 @@ func authenticateClient(connection *websocket.Conn, twitchChannel string) {
 }
 
 func receiveHandler(connection *websocket.Conn, channel string) {
+	/*
+	RIGHT NOW THIS IS BUGGED AND THE TIMER LOGIC WILL ONLY WORK ON A STREAM
+	WHERE A MESSAGE WAS SENT. OTHERWISE, IT WILL HANG FOREVER.
+	*/
+	timer := time.NewTimer(10 * time.Second)
 	for {
+		// fmt.Print(timer.C)
 		_, msg, err := connection.ReadMessage()
 		if err != nil {
 			log.Println("Error in receive:", err)
 			return
 		}
-		if msg != nil {
+		select {
+		case <-timer.C:
+			fmt.Println("Timer has reached its max value")
+			connection.Close()
+			return
+		default:
 			// when a message is recieved in the channel, ping and then parse the message
 			if s.Contains(string(msg), "PRIVMSG") {
+				timer = time.NewTimer(10 * time.Second)
 				message := parseMessage(string(msg))
 				username := parseUserName(string(msg))
 				fmt.Printf("%s: %s \n", username, message)
@@ -76,10 +92,22 @@ func receiveHandler(connection *websocket.Conn, channel string) {
 			}
 		}
 	}
+
 }
 
+func StartStream(twitch_channel string){
+	connection := createWebSocketClient()
+	authenticateClient(connection, twitch_channel)
+	receiveHandler(connection, twitch_channel)
+	defer connection.Close()
+}
+
+
 func main() {
-	// Channel to indicate that the receiverHandler is done
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
 	var twitch_channel string = os.Args[1]
 	connection := createWebSocketClient()
 	authenticateClient(connection, twitch_channel)
