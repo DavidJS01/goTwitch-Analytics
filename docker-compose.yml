@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   db:
+    container_name: db
     image: postgres:14.1-alpine
     restart: always
     environment:
@@ -10,8 +11,70 @@ services:
       - '5432:5432'
     volumes: 
       - db:/var/lib/postgresql/data
+    networks:
+      - dev-network
+
+  server:
+    container_name: server
+    build:
+      context: .
+      dockerfile: ./docker/web_server/Dockerfile
+    restart: always
+    ports:
+      - '8080:8080'
+    expose:
+      - '8080'
+
+  message-broker:
+    image: rabbitmq:3.8-management
+    container_name: message-broker
+    ports:
+      - 5672:5672   # for sender and consumer connections
+      - 15672:15672 # for serve RabbitMQ GUI
+    volumes:
+      - ${HOME}/dev-rabbitmq/data/:/var/lib/rabbitmq
+      - ${HOME}/dev-rabbitmq/log/:/var/log/rabbitmq
+    restart: always
+    networks:
+      - dev-network
+  
+  consumer:
+    container_name: consumer
+    build:
+      context: .
+      dockerfile: ./docker/mq_consumer/Dockerfile
+    environment:
+      AMQP_SERVER_URL: amqp://guest:guest@message-broker:5672/
+    restart: always
+    networks:
+      - dev-network
+    depends_on:
+      # - sender
+      - message-broker
+    secrets:
+      - twitchAuth
+  messager:
+    container_name: messager
+    ports:
+      - 9090:9090
+    build:
+      context: .
+      dockerfile: ./docker/mq_sender/Dockerfile
+    environment:
+      AMQP_SERVER_URL: amqp://guest:guest@message-broker:5672/
+    restart: always
+    networks:
+      - dev-network
+    depends_on:
+      - message-broker
+
+
 volumes:
   db:
     driver: local
-
-    # docker run --name postgres-db -e POSTGRES_PASSWORD=$DOCKER_POSTGRES_PASSWORD -p 5432:5432 -d postgres
+networks:
+  dev-network:
+    driver: bridge
+secrets:
+  twitchAuth:
+    external: true
