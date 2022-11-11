@@ -1,0 +1,141 @@
+slice_name: Top 10 Message Count by Twitch Channel
+viz_type: echarts_timeseries_bar
+params:
+  adhoc_filters:
+  - clause: WHERE
+    comparator: null
+    datasourceWarning: false
+    expressionType: SQL
+    filterOptionName: filter_l2q9i3ojp9_1h9j4jh0648
+    isExtra: false
+    isNew: false
+    operator: null
+    sqlExpression: twitch_channel != 'yourragegaming'
+    subject: null
+  annotation_layers: []
+  applied_time_extras: {}
+  color_scheme: supersetColors
+  comparison_type: values
+  dashboards:
+  - 3
+  datasource: 1__table
+  forecastEnabled: false
+  forecastInterval: 0.8
+  forecastPeriods: 10
+  granularity_sqla: now
+  groupby:
+  - twitch_channel
+  legendOrientation: top
+  legendType: scroll
+  limit: 10
+  logAxis: false
+  metrics:
+  - count
+  minorSplitLine: false
+  only_total: true
+  order_desc: true
+  orientation: vertical
+  rich_tooltip: true
+  row_limit: 10000
+  show_empty_columns: false
+  show_legend: true
+  show_value: true
+  slice_id: 1
+  stack: false
+  standardizedFormData:
+    controls:
+      columns: []
+      metrics: []
+    memorizedFormData:
+    - - table
+      - adhoc_filters: []
+        all_columns: []
+        applied_time_extras: {}
+        datasource: 1__table
+        granularity_sqla: message_timestamp
+        groupby: []
+        percent_metrics: []
+        time_range: No filter
+        url_params:
+          dataset_id: '1'
+          dataset_type: table
+        viz_type: table
+    - - echarts_area
+      - adhoc_filters: []
+        annotation_layers: []
+        color_scheme: supersetColors
+        comparison_type: values
+        datasource: 1__table
+        forecastInterval: 0.8
+        forecastPeriods: 10
+        granularity_sqla: message_timestamp
+        groupby: []
+        legendOrientation: top
+        legendType: scroll
+        markerSize: 6
+        metrics: []
+        only_total: true
+        opacity: 0.2
+        order_desc: true
+        rich_tooltip: true
+        row_limit: 10000
+        seriesType: line
+        show_empty_columns: true
+        show_legend: true
+        standardizedFormData:
+          controls:
+            columns: []
+            metrics: []
+          memorizedFormData:
+          - - table
+            - adhoc_filters: []
+              all_columns: []
+              applied_time_extras: {}
+              datasource: 1__table
+              granularity_sqla: message_timestamp
+              groupby: []
+              percent_metrics: []
+              time_range: No filter
+              url_params:
+                dataset_id: '1'
+                dataset_type: table
+              viz_type: table
+        time_grain_sqla: P1D
+        time_range: No filter
+        tooltipTimeFormat: smart_date
+        truncate_metric: true
+        url_params:
+          dataset_id: '1'
+          dataset_type: table
+        viz_type: echarts_area
+        x_axis_time_format: smart_date
+        x_axis_title_margin: 15
+        y_axis_bounds:
+        - null
+        - null
+        y_axis_format: SMART_NUMBER
+        y_axis_title_margin: 15
+        y_axis_title_position: Left
+  time_grain_sqla: P1Y
+  time_range: No filter
+  timeseries_limit_metric: null
+  tooltipTimeFormat: smart_date
+  truncateYAxis: false
+  truncate_metric: true
+  viz_type: echarts_timeseries_bar
+  xAxisLabelRotation: 0
+  x_axis_time_format: smart_date
+  x_axis_title: Twitch Channel
+  x_axis_title_margin: 30
+  y_axis_bounds:
+  - null
+  - null
+  y_axis_format: SMART_NUMBER
+  y_axis_title: Total Messages
+  y_axis_title_margin: 30
+  y_axis_title_position: Left
+  zoomable: false
+cache_timeout: null
+uuid: 03d6ba55-9cdb-4ba2-9bf1-0bf3f7eaca50
+version: 1.0.0
+dataset_uuid: f1be61a9-6d9b-4cbf-891f-8a1db698e462

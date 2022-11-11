@@ -1,0 +1,56 @@
+table_name: 20 Most Frequently Used Words
+main_dttm_col: null
+description: null
+default_endpoint: null
+offset: 0
+cache_timeout: null
+schema: twitch
+sql: "select word, count(*) from (SELECT username, twitch_channel, \n       regexp_split_to_table(message\
+  \ , '\\s') as word\nFROM twitch.messages m) as t\nwhere word not in ('', 'the',\
+  \ 'at', 'the', 'is', 'a', 'you', 'to', 'it', 'i',\n'in', 'I', 'and', 'u', 'that',\
+  \ 'for', 'are', 'do', 'no', 'not', 'so', 'they',\n'of', 'he', 'this', 'on', 'my',\
+  \ 'me', 'was'\n)\nand  username not in ('nightbot', 'streamelements')\nand word\
+  \ not like '!'\ngroup by word\norder by count desc \nlimit 20"
+params: null
+template_params: null
+filter_select_enabled: false
+fetch_values_predicate: null
+extra: null
+uuid: 045f8015-72df-410d-8695-00f9004431d9
+metrics:
+- metric_name: count
+  verbose_name: null
+  metric_type: null
+  expression: count(*)
+  description: null
+  d3format: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+columns:
+- column_name: count
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: LONGINTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: word
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+version: 1.0.0
+database_uuid: 1d245011-f47f-4492-9e7d-08a2f26de548
