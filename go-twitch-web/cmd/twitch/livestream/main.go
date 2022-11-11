@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/websocket"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"log"
 	"net/url"
@@ -11,7 +12,6 @@ import (
 	s "strings"
 	"test.com/m/internal/database"
 	"time"
-	"github.com/joho/godotenv"
 )
 
 func parseUserName(twitchMessage string) string {
@@ -62,8 +62,8 @@ func authenticateClient(connection *websocket.Conn, twitchChannel string) {
 
 func receiveHandler(connection *websocket.Conn, channel string) {
 	/*
-	RIGHT NOW THIS IS BUGGED AND THE TIMER LOGIC WILL ONLY WORK ON A STREAM
-	WHERE A MESSAGE WAS SENT. OTHERWISE, IT WILL HANG FOREVER.
+		RIGHT NOW THIS IS BUGGED AND THE TIMER LOGIC WILL ONLY WORK ON A STREAM
+		WHERE A MESSAGE WAS SENT. OTHERWISE, IT WILL HANG FOREVER.
 	*/
 	timer := time.NewTimer(10 * time.Second)
 	for {
@@ -95,13 +95,12 @@ func receiveHandler(connection *websocket.Conn, channel string) {
 
 }
 
-func StartStream(twitch_channel string){
+func StartStream(twitch_channel string) {
 	connection := createWebSocketClient()
 	authenticateClient(connection, twitch_channel)
 	receiveHandler(connection, twitch_channel)
 	defer connection.Close()
 }
-
 
 func main() {
 	err := godotenv.Load(".env")

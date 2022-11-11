@@ -22,7 +22,7 @@ RUN go mod download
 # # Set necessary environment variables needed 
 # # for our image and build the server.
 # ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
-RUN go build cmd/api/main.go
+RUN go build ./go-twitch-web/cmd/api/main.go
 RUN ls
 
 # # # Command to run when starting the container.

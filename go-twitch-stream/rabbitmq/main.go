@@ -1,27 +1,25 @@
-package rabbitmq 
+package rabbitmq
 
 import (
+	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"os"
-	"fmt"
 )
-
-
 
 func ConnectToRabbitMQ() *amqp.Connection {
 	// Define RabbitMQ server URL.
 	amqpServerURL := os.Getenv("AMQP_SERVER_URL") //@TODO add this
-   
+
 	// Create a new RabbitMQ connection.
 	connectRabbitMQ, err := amqp.Dial(amqpServerURL)
 	if err != nil {
 		fmt.Print("error connecting to rabbit mq")
-	   panic(err)
+		panic(err)
 	}
 	return connectRabbitMQ
-   
-	}
-   
+
+}
+
 func ConnectToRabbitMQChannel(connectRabbitMQ *amqp.Connection) *amqp.Channel {
 	channelRabbitMQ, err := connectRabbitMQ.Channel()
 	if err != nil {
@@ -31,7 +29,7 @@ func ConnectToRabbitMQChannel(connectRabbitMQ *amqp.Connection) *amqp.Channel {
 }
 
 func CreateMessage(body []byte) amqp.Publishing {
-	message := amqp.Publishing {
+	message := amqp.Publishing{
 		ContentType: "text/plain",
 		Body:        body,
 	}

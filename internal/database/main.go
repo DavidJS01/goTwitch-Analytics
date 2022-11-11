@@ -3,17 +3,17 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	_ "github.com/lib/pq"
+	"log"
 )
 
 type Streamer struct {
-	Name string
+	Name      string
 	Is_Active bool
 }
 
 const (
-	host     = "db"
+	host     = "172.17.0.1"
 	port     = 5432
 	user     = "postgres"
 	password = "postgres"
@@ -21,23 +21,22 @@ const (
 )
 
 func newNullString(pid int) sql.NullInt64 {
-    if pid == 0 {
-        return sql.NullInt64{}
+	if pid == 0 {
+		return sql.NullInt64{}
 	}
-    return sql.NullInt64 {
+	return sql.NullInt64{
 		Int64: int64(pid),
 		Valid: true,
 	}
 }
 
-
 func connectToDB() *sql.DB {
 	psqlInfo := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable",
-	user,
-	password,
-	host,
-	port,
-	dbname)
+		user,
+		password,
+		host,
+		port,
+		dbname)
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
@@ -102,10 +101,10 @@ func InsertStreamer(channel string, is_active bool) error {
 	if err != nil {
 		panic(err)
 	}
-	return err 
+	return err
 }
 
-func GetStreamerData() []Streamer {
+func GetStreamerData() ([]Streamer, error) {
 	streamers := []Streamer{}
 	db := connectToDB()
 	sqlStatement := `
@@ -114,23 +113,26 @@ func GetStreamerData() []Streamer {
 		) AS t
 		WHERE rank_number = 1
 		`
-		rows, err := db.Query(sqlStatement)
-		defer rows.Close()
-		var streamer Streamer
-		for rows.Next() {
-			err = rows.Scan(&streamer.Name, &streamer.Is_Active)
-			streamers = append(streamers, streamer)
-			
-		}
+	rows, err := db.Query(sqlStatement)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	var streamer Streamer
+	for rows.Next() {
+		err = rows.Scan(&streamer.Name, &streamer.Is_Active)
+		streamers = append(streamers, streamer)
+
+	}
 	db.Close()
 	if err != nil {
 		panic(err)
 	}
-	return streamers
+	return streamers, err
 
 }
 
-func CreateStreamEventsTable(){
+func CreateStreamEventsTable() {
 	db := connectToDB()
 	sqlStatement := `
 	create table if not exists twitch.stream_events  (
@@ -161,7 +163,7 @@ func GetLatestPID(streamer string) int {
 	if err != nil {
 		log.Print("L")
 	}
-	
+
 	db.Close()
 	if err != nil {
 		panic(err)
@@ -170,9 +172,9 @@ func GetLatestPID(streamer string) int {
 }
 
 
-func InsertStreamEvent(twitchChannel string, listening bool, pid int){
+func InsertStreamEvent(twitchChannel string, listening bool, pid int) {
 	db := connectToDB()
-	sqlStatement :=`
+	sqlStatement := `
 	INSERT INTO twitch.stream_events (twitch_channel, listening, pid)
 	VALUES ($1, $2, $3);`
 	_, err := db.Exec(sqlStatement, twitchChannel, listening, newNullString(pid))
