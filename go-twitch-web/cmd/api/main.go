@@ -54,11 +54,16 @@ func listStreamersHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(x)
 }
 
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "assets/index.html")
+	
+}
+
 func main() {
 	// handle func is convienance method on http. registers function to a path
 	// on default serve mux.
 	mux := mux.NewRouter().StrictSlash(true)
-
+	mux.HandleFunc("/about", homeHandler)
 	mux.HandleFunc("/stream/upsert", upsertStreamerHandler).Queries("stream", "{stream}", "disable", "{disable}").Methods("POST")
 	mux.HandleFunc("/stream/list", listStreamersHandler).Methods("GET")
 	http.ListenAndServe(":8080", mux)

@@ -14,6 +14,30 @@ services:
     networks:
       - dev-network
 
+  grafana:
+    build:
+      context: .
+      dockerfile: ./docker/grafana/Dockerfile
+    ports:
+      - '1337:3000'
+    volumes:
+      - grafana-data:/var/lib/grafana
+  
+  superset:
+    build:
+      context: .
+      dockerfile: ./docker/superset/Dockerfile
+    ports:
+      - '8088:8088'
+    expose:
+      - '8088'
+    volumes:
+      - superset-data:/var/lib/superset
+    extra_hosts:
+        - "pghost:172.17.0.1"
+    networks:
+      - dev-network
+  
   server:
     container_name: server
     build:
@@ -71,6 +95,10 @@ services:
 
 volumes:
   db:
+    driver: local
+  grafana-data:
+    driver: local
+  superset-data:
     driver: local
 networks:
   dev-network:
