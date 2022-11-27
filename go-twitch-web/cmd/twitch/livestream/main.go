@@ -11,7 +11,6 @@ import (
 	"regexp"
 	s "strings"
 	"test.com/m/internal/database"
-	"time"
 )
 
 func parseUserName(twitchMessage string) string {
@@ -29,9 +28,9 @@ func parseMessage(twitchMessage string) string {
 	return message
 }
 
-func createWebSocketClient() *websocket.Conn {
+func createWebSocketClient(host string, scheme string) *websocket.Conn {
 	log.Print("Creating websocket client")
-	u := url.URL{Scheme: "wss", Host: "irc-ws.chat.twitch.tv:443"}
+	u := url.URL{Scheme: scheme, Host: host}
 	log.Printf("connecting to %s", u.String())
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
@@ -60,43 +59,34 @@ func authenticateClient(connection *websocket.Conn, twitchChannel string) {
 	}
 }
 
+
+func parseTwitchMessage(message []byte, channel string, connection *websocket.Conn) {
+	messageString := string(message)
+	if s.Contains(messageString, "PRIVMSG") {
+		message := parseMessage(messageString)
+		username := parseUserName(messageString)
+		fmt.Printf("%s: %s \n", username, messageString)
+		database.InsertTwitchMesasge(username, message, channel)
+	}
+	if s.Contains(messageString, "PING") {
+		connection.WriteMessage(websocket.TextMessage, []byte("PONG :tmi.twitch.tv"))
+	}
+}
+
+
 func receiveHandler(connection *websocket.Conn, channel string) {
-	/*
-		RIGHT NOW THIS IS BUGGED AND THE TIMER LOGIC WILL ONLY WORK ON A STREAM
-		WHERE A MESSAGE WAS SENT. OTHERWISE, IT WILL HANG FOREVER.
-	*/
-	timer := time.NewTimer(10 * time.Second)
 	for {
-		// fmt.Print(timer.C)
 		_, msg, err := connection.ReadMessage()
 		if err != nil {
-			log.Println("Error in receive:", err)
+			log.Println("Error while recieving a twitch message:", err)
 			return
 		}
-		select {
-		case <-timer.C:
-			fmt.Println("Timer has reached its max value")
-			connection.Close()
-			return
-		default:
-			// when a message is recieved in the channel, ping and then parse the message
-			if s.Contains(string(msg), "PRIVMSG") {
-				timer = time.NewTimer(10 * time.Second)
-				message := parseMessage(string(msg))
-				username := parseUserName(string(msg))
-				fmt.Printf("%s: %s \n", username, message)
-				database.InsertTwitchMesasge(username, message, channel)
-			}
-			if s.Contains(string(msg), "PING") {
-				connection.WriteMessage(websocket.TextMessage, []byte("PONG :tmi.twitch.tv"))
-			}
-		}
+		parseTwitchMessage(msg, channel, connection)
 	}
-
 }
 
 func StartStream(twitch_channel string) {
-	connection := createWebSocketClient()
+	connection := createWebSocketClient("irc-ws.chat.twitch.tv:443", "wss")
 	authenticateClient(connection, twitch_channel)
 	receiveHandler(connection, twitch_channel)
 	defer connection.Close()
@@ -108,8 +98,26 @@ func main() {
 		log.Fatalf("Error loading .env file")
 	}
 	var twitch_channel string = os.Args[1]
-	connection := createWebSocketClient()
+	connection := createWebSocketClient("irc-ws.chat.twitch.tv:443", "wss")
 	authenticateClient(connection, twitch_channel)
+	fmt.Print("got to the handler")
 	receiveHandler(connection, twitch_channel)
 	defer connection.Close()
 }
+
+
+
+
+/*
+
+if s.Contains(string(msg), "PRIVMSG") {
+				timer = time.NewTimer(10 * time.Second)
+				message := parseMessage(string(msg))
+				username := parseUserName(string(msg))
+				fmt.Printf("%s: %s \n", username, message)
+				database.InsertTwitchMesasge(username, message, channel)
+			}
+			if s.Contains(string(msg), "PING") {
+				connection.WriteMessage(websocket.TextMessage, []byte("PONG :tmi.twitch.tv"))
+			}
+*/
