@@ -1,4 +1,16 @@
-## Go-Twitch Analytics
+# Go-Twitch Analytics
+
+<p float="left" align="">
+  <img src="assets/readme/gopher-dance-long-3x.gif"  />
+  <img src="assets/readme/twitch9.png" width=60% /> 
+</p>
+
+<p align="center"> <b>Golang meets Twitch chat! </p>
+
+
+
+
+## What is Go-Twitch Analytics?
 Go-Twitch is a self-service, containerized solution to aggregating and visualizing Twitch chat data in near-real time.
 
 Go-Twitch is a rewrite of my first data engineering Python project, but written in Go (with more elaborate technology).
