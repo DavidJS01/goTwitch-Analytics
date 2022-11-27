@@ -1,11 +1,12 @@
 # Go-Twitch Analytics
+<p float="left"> <b>Golang meets Twitch chat! </p>
 
 <p float="left" align="">
-  <img src="assets/readme/gopher-dance-long-3x.gif"  />
-  <img align=right src="assets/readme/transparent_twitch.png" width=200px /> 
+  <img align = center src="assets/readme/gopher-dance-long-3x.gif"  />
+  <img align=center src="assets/readme/transparent_twitch.png" width=200px /> 
 </p>
 
-<p align="center"> <b>Golang meets Twitch chat! </p>
+
 
 
 
