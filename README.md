@@ -2,7 +2,7 @@
 
 <p float="left" align="">
   <img src="assets/readme/gopher-dance-long-3x.gif"  />
-  <img src="assets/readme/twitch_logo.jpg" width=60% /> 
+  <img align=right src="assets/readme/transparent_twitch.png" width=200px /> 
 </p>
 
 <p align="center"> <b>Golang meets Twitch chat! </p>
