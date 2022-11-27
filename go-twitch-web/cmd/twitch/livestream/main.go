@@ -104,20 +104,3 @@ func main() {
 	receiveHandler(connection, twitch_channel)
 	defer connection.Close()
 }
-
-
-
-
-/*
-
-if s.Contains(string(msg), "PRIVMSG") {
-				timer = time.NewTimer(10 * time.Second)
-				message := parseMessage(string(msg))
-				username := parseUserName(string(msg))
-				fmt.Printf("%s: %s \n", username, message)
-				database.InsertTwitchMesasge(username, message, channel)
-			}
-			if s.Contains(string(msg), "PING") {
-				connection.WriteMessage(websocket.TextMessage, []byte("PONG :tmi.twitch.tv"))
-			}
-*/
