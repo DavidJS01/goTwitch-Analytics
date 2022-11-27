@@ -1,5 +1,5 @@
 # Go-Twitch Analytics
-<p float="left"> <b>Golang meets Twitch chat! </p>
+<p float="left"> <b>Golang meets Twitch chat!</b> </p>
 
 <p float="left" align="">
   <img align = center src="assets/readme/gopher-dance-long-3x.gif"  />
