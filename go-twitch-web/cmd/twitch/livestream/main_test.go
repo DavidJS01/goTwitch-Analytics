@@ -95,6 +95,33 @@ func TestAuthenticateClient(t *testing.T) {
 
 }
 
+
+func mockInsertTwitchMessage(username string, message string, channel string) {
+	return
+}
+
 func TestParseTwitchMessage(t *testing.T){
-// @TODO: finish this test
+	// create messages to test on
+	mockTwitchMessage := []byte("username!username@username.tmi.twitch.tv PRIVMSG #katevolved :message here")
+	mockPingMessage := []byte("PING server message here")
+	// start testing websocket server
+	s := httptest.NewServer(http.HandlerFunc(echo))
+	defer s.Close()
+	// create client websocket conn
+	address := z.Split(s.URL, "http://")[1]
+	client := createWebSocketClient(address, "ws")
+
+	// run twitch message test
+	parseTwitchMessage(mockTwitchMessage, "Katevolved", client, mockInsertTwitchMessage)
+	// run ping message test
+	parseTwitchMessage(mockPingMessage, "Katevolved", client, mockInsertTwitchMessage)
+	
+	_, msg, _ := client.ReadMessage()
+	if string(msg) != "PONG :tmi.twitch.tv" {
+		t.Errorf("Unexpected PING response, expected PONG got %s", string(msg))
+	}
+
+
+
+	
 }

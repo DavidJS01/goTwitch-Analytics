@@ -20,6 +20,21 @@ const (
 	dbname   = "postgres"
 )
 
+type InsertMessage func(username string, message string, channel string)
+
+func InsertTwitchMesasge(username string, message string, channel string) {
+	db := connectToDB()
+	sqlStatement := `
+				INSERT INTO "postgres"."twitch"."messages" (username, twitch_channel, message)
+				VALUES ($1, $2, $3)`
+	_, err := db.Exec(sqlStatement, username, channel, message)
+	db.Close()
+	if err != nil {
+		panic(err)
+	}
+}
+
+
 func newNullString(pid int) sql.NullInt64 {
 	if pid == 0 {
 		return sql.NullInt64{}
@@ -61,17 +76,7 @@ func CreateMessageTable() {
 
 }
 
-func InsertTwitchMesasge(username string, message string, channel string) {
-	db := connectToDB()
-	sqlStatement := `
-				INSERT INTO "postgres"."twitch"."messages" (username, twitch_channel, message)
-				VALUES ($1, $2, $3)`
-	_, err := db.Exec(sqlStatement, username, channel, message)
-	db.Close()
-	if err != nil {
-		panic(err)
-	}
-}
+
 
 func CreateStreamerTable() {
 	db := connectToDB()
@@ -170,7 +175,6 @@ func GetLatestPID(streamer string) int {
 	}
 	return pid
 }
-
 
 func InsertStreamEvent(twitchChannel string, listening bool, pid int) {
 	db := connectToDB()

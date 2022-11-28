@@ -13,11 +13,12 @@ import (
 	"test.com/m/internal/database"
 )
 
+
+
 func parseUserName(twitchMessage string) string {
-	rx := regexp.MustCompile(`:(.*?)!`)
-	username := rx.FindAllStringSubmatch(twitchMessage, -1)[0][0]
-	username = s.Trim(username, ":")
-	username = s.Trim(username, "!")
+	rx := regexp.MustCompile(`(\w*)!`)
+	username := rx.FindString(twitchMessage)
+	username = s.Split(username, "!")[0]
 	return username
 }
 
@@ -60,13 +61,13 @@ func authenticateClient(connection *websocket.Conn, twitchChannel string) {
 }
 
 
-func parseTwitchMessage(message []byte, channel string, connection *websocket.Conn) {
+func parseTwitchMessage(message []byte, channel string, connection *websocket.Conn, insertMessage database.InsertMessage) {
 	messageString := string(message)
 	if s.Contains(messageString, "PRIVMSG") {
 		message := parseMessage(messageString)
 		username := parseUserName(messageString)
 		fmt.Printf("%s: %s \n", username, messageString)
-		database.InsertTwitchMesasge(username, message, channel)
+		insertMessage(username, message, channel)
 	}
 	if s.Contains(messageString, "PING") {
 		connection.WriteMessage(websocket.TextMessage, []byte("PONG :tmi.twitch.tv"))
@@ -81,7 +82,7 @@ func receiveHandler(connection *websocket.Conn, channel string) {
 			log.Println("Error while recieving a twitch message:", err)
 			return
 		}
-		parseTwitchMessage(msg, channel, connection)
+		parseTwitchMessage(msg, channel, connection, database.InsertTwitchMesasge)
 	}
 }
 
