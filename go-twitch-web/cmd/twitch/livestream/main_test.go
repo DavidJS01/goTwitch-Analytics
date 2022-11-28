@@ -48,12 +48,19 @@ func TestParseMessage(t *testing.T) {
 }
 
 func TestCreateWebsocketClient(t *testing.T) {
+	// creates bytes buffer for panic test
 	s := httptest.NewServer(http.HandlerFunc(echo))
 	address := z.Split(s.URL, "http://")[1]
 	defer s.Close()
 
-	client := createWebSocketClient(address, "ws")
-	fmt.Print(client.RemoteAddr().String())
+	// test for web socket error
+	_, err := createWebSocketClient("bad_address", "ws")
+	if err == nil {
+		t.Error("Expected error when creating ws client with bad address")
+	}
+
+	// test for web socket without error
+	client, _ := createWebSocketClient(address, "ws")
 	if client.RemoteAddr().String() != address {
 		t.Errorf("Error connecting test ws client to 127.0.0, server url %s, client url %s", address, client.RemoteAddr().String())
 	}
@@ -69,7 +76,7 @@ func TestAuthenticateClient(t *testing.T) {
 	s := httptest.NewServer(http.HandlerFunc(echo))
 	defer s.Close()
 	address := z.Split(s.URL, "http://")[1]
-	client := createWebSocketClient(address, "ws")
+	client, _ := createWebSocketClient(address, "ws")
 	authenticateClient(client, "twitch_channel_here")
 
 	// test for `PASS <oauth_password> message`
@@ -96,9 +103,7 @@ func TestAuthenticateClient(t *testing.T) {
 }
 
 
-func mockInsertTwitchMessage(username string, message string, channel string) {
-	return
-}
+func mockInsertTwitchMessage(username string, message string, channel string) {}
 
 func TestParseTwitchMessage(t *testing.T){
 	// create messages to test on
@@ -109,7 +114,7 @@ func TestParseTwitchMessage(t *testing.T){
 	defer s.Close()
 	// create client websocket conn
 	address := z.Split(s.URL, "http://")[1]
-	client := createWebSocketClient(address, "ws")
+	client, _ := createWebSocketClient(address, "ws")
 
 	// run twitch message test
 	parseTwitchMessage(mockTwitchMessage, "Katevolved", client, mockInsertTwitchMessage)

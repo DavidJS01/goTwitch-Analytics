@@ -29,16 +29,16 @@ func parseMessage(twitchMessage string) string {
 	return message
 }
 
-func createWebSocketClient(host string, scheme string) *websocket.Conn {
+func createWebSocketClient(host string, scheme string) (*websocket.Conn, error) {
 	log.Print("Creating websocket client")
 	u := url.URL{Scheme: scheme, Host: host}
 	log.Printf("connecting to %s", u.String())
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
-		log.Fatal("dial:", err)
+		return nil, err
 	}
-	return c
+	return c, nil
 }
 
 func authenticateClient(connection *websocket.Conn, twitchChannel string) {
@@ -81,27 +81,26 @@ func receiveHandler(connection *websocket.Conn, channel string) {
 		if err != nil {
 			log.Println("Error while recieving a twitch message:", err)
 			return
-		}
+		} else {
 		parseTwitchMessage(msg, channel, connection, database.InsertTwitchMesasge)
+		}
 	}
 }
 
 func StartStream(twitch_channel string) {
-	connection := createWebSocketClient("irc-ws.chat.twitch.tv:443", "wss")
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+	connection, err := createWebSocketClient("irc-ws.chat.twitch.tv:443", "wss")
+	if err != nil {
+		log.Fatalf("Error establishing ws client %s", err)
+	}	
 	authenticateClient(connection, twitch_channel)
 	receiveHandler(connection, twitch_channel)
 	defer connection.Close()
 }
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-	var twitch_channel string = os.Args[1]
-	connection := createWebSocketClient("irc-ws.chat.twitch.tv:443", "wss")
-	authenticateClient(connection, twitch_channel)
-	fmt.Print("got to the handler")
-	receiveHandler(connection, twitch_channel)
-	defer connection.Close()
+	StartStream(os.Args[1])
 }
