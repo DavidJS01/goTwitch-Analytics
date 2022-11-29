@@ -5,7 +5,7 @@ import (
 	"log"
 	"os/exec"
 	s "strings"
-	mq "test.com/m/go-twitch-events/broker"
+	mq "test.com/m/go-twitch-events/rabbitmq"
 	"test.com/m/internal/database"
 )
 
