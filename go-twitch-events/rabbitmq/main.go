@@ -1,7 +1,6 @@
 package rabbitmq
 
 import (
-	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"os"
 )
@@ -13,7 +12,6 @@ func ConnectToRabbitMQ() *amqp.Connection {
 	// Create a new RabbitMQ connection.
 	connectRabbitMQ, err := amqp.Dial(amqpServerURL)
 	if err != nil {
-		fmt.Print("error connecting to rabbit mq")
 		panic(err)
 	}
 	return connectRabbitMQ

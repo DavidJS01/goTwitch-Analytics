@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	mq "test.com/m/go-twitch-events/broker"
+	mq "test.com/m/go-twitch-events/rabbitmq"
 )
 
 type MessageResponse struct {
