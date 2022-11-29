@@ -102,10 +102,9 @@ func TestAuthenticateClient(t *testing.T) {
 
 }
 
-
 func mockInsertTwitchMessage(username string, message string, channel string) {}
 
-func TestParseTwitchMessage(t *testing.T){
+func TestParseTwitchMessage(t *testing.T) {
 	// create messages to test on
 	mockTwitchMessage := []byte("username!username@username.tmi.twitch.tv PRIVMSG #katevolved :message here")
 	mockPingMessage := []byte("PING server message here")
@@ -120,13 +119,10 @@ func TestParseTwitchMessage(t *testing.T){
 	parseTwitchMessage(mockTwitchMessage, "Katevolved", client, mockInsertTwitchMessage)
 	// run ping message test
 	parseTwitchMessage(mockPingMessage, "Katevolved", client, mockInsertTwitchMessage)
-	
+
 	_, msg, _ := client.ReadMessage()
 	if string(msg) != "PONG :tmi.twitch.tv" {
 		t.Errorf("Unexpected PING response, expected PONG got %s", string(msg))
 	}
 
-
-
-	
 }

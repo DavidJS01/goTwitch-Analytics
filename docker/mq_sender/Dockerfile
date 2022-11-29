@@ -15,7 +15,7 @@ COPY . .
 # Set necessary environment variables needed 
 # for our image and build the sender.
 ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
-RUN go build ./go-twitch-stream/rabbitmq/messager/main.go
+RUN go build ./go-twitch-events/messager/main.go
 
 FROM scratch
 

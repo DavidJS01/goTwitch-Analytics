@@ -20,7 +20,15 @@ const (
 	dbname   = "postgres"
 )
 
+type InsertStreamerAPI func(channel string, is_active bool) error
+
 type InsertMessage func(username string, message string, channel string)
+
+type StreamEvents struct {
+	Channel           string
+	Is_Active         bool
+	InsertStreamEvent InsertStreamerAPI
+}
 
 func InsertTwitchMesasge(username string, message string, channel string) {
 	db := connectToDB()
@@ -33,7 +41,6 @@ func InsertTwitchMesasge(username string, message string, channel string) {
 		panic(err)
 	}
 }
-
 
 func newNullString(pid int) sql.NullInt64 {
 	if pid == 0 {
@@ -75,8 +82,6 @@ func CreateMessageTable() {
 	db.Close()
 
 }
-
-
 
 func CreateStreamerTable() {
 	db := connectToDB()

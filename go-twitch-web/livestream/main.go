@@ -13,8 +13,6 @@ import (
 	"test.com/m/internal/database"
 )
 
-
-
 func parseUserName(twitchMessage string) string {
 	rx := regexp.MustCompile(`(\w*)!`)
 	username := rx.FindString(twitchMessage)
@@ -60,7 +58,6 @@ func authenticateClient(connection *websocket.Conn, twitchChannel string) {
 	}
 }
 
-
 func parseTwitchMessage(message []byte, channel string, connection *websocket.Conn, insertMessage database.InsertMessage) {
 	messageString := string(message)
 	if s.Contains(messageString, "PRIVMSG") {
@@ -74,7 +71,6 @@ func parseTwitchMessage(message []byte, channel string, connection *websocket.Co
 	}
 }
 
-
 func receiveHandler(connection *websocket.Conn, channel string) {
 	for {
 		_, msg, err := connection.ReadMessage()
@@ -82,7 +78,7 @@ func receiveHandler(connection *websocket.Conn, channel string) {
 			log.Println("Error while recieving a twitch message:", err)
 			return
 		} else {
-		parseTwitchMessage(msg, channel, connection, database.InsertTwitchMesasge)
+			parseTwitchMessage(msg, channel, connection, database.InsertTwitchMesasge)
 		}
 	}
 }
@@ -95,7 +91,7 @@ func StartStream(twitch_channel string) {
 	connection, err := createWebSocketClient("irc-ws.chat.twitch.tv:443", "wss")
 	if err != nil {
 		log.Fatalf("Error establishing ws client %s", err)
-	}	
+	}
 	authenticateClient(connection, twitch_channel)
 	receiveHandler(connection, twitch_channel)
 	defer connection.Close()

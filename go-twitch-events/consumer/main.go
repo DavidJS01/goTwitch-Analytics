@@ -5,7 +5,7 @@ import (
 	"log"
 	"os/exec"
 	s "strings"
-	mq "test.com/m/go-twitch-stream/rabbitmq"
+	mq "test.com/m/go-twitch-events/broker"
 	"test.com/m/internal/database"
 )
 
@@ -15,14 +15,9 @@ func listenStream(stream string) {
 	cmd := exec.Command("sh", "-c", fmt.Sprintf("echo $$; exec ./stream %s", stream))
 	err := cmd.Start()
 	if err != nil {
-		log.Print("{fuck")
+		log.Print(err)
 	}
 	database.InsertStreamEvent(stream, true, cmd.Process.Pid)
-	// err := cmd.Wait()
-	// if err != nil {
-	//     log.Printf("Error on stream command")
-	//     log.Print(err)
-	// }
 }
 
 func main() {
@@ -57,7 +52,6 @@ func main() {
 		log.Println(err)
 	}
 
-	// Build a welcome message.
 	log.Println("Successfully connected to RabbitMQ")
 	log.Println("Waiting for messages")
 
@@ -66,20 +60,33 @@ func main() {
 
 	go func() {
 		for message := range messages {
-			// For example, show received message in a console.
 			log.Printf(" > Received message: %s\n", message.Body)
 			command := string(message.Body)
 			if s.Contains(command, "start") {
 				stream := s.Split(command, " ")[1]
+				err := database.InsertStreamer(stream, true)
+				if err != nil {
+					log.Print(err)
+				}
 				listenStream(stream)
 			}
 			if s.Contains(command, "stop") {
 				stream := s.Split(command, " ")[1]
 				pid := database.GetLatestPID(stream)
 				cmd := exec.Command("kill", fmt.Sprint(pid))
-				cmd.Run()
-				cmd.Wait()
+				err := cmd.Run()
+				if err != nil {
+					log.Print(err)
+				}
+				err = cmd.Wait()
+				if err != nil {
+					log.Print(err)
+				}
 				database.InsertStreamEvent(stream, false, pid)
+				err = database.InsertStreamer(stream, false)
+				if err != nil {
+					log.Print(err)
+				}
 			}
 
 		}

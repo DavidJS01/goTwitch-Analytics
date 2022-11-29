@@ -7,10 +7,6 @@
 </p>
 
 
-
-
-
-
 ## What is Go-Twitch Analytics?
 Go-Twitch is a self-service, containerized solution to aggregating and visualizing Twitch chat data in near-real time.
 
