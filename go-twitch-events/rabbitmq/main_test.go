@@ -18,7 +18,7 @@ func TestConnectToRabbitMQ(t *testing.T) {
 	t.Log(os.Getenv("AMQP_SERVER_URL"))
 
 	conn := ConnectToRabbitMQ()
-	if conn.RemoteAddr().String() != rabbitMQAddress {
+	if conn.RemoteAddr().String() + "/" != rabbitMQAddress {
 		t.Errorf("Connection address does not match rabbitmq url, expected %s got %s", rabbitMQAddress, conn.RemoteAddr().String())
 	}
 	
