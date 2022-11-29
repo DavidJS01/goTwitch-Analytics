@@ -10,10 +10,16 @@ jobs:
           RABBITMQ_DEFAULT_USER: guest
           RABBITMQ_DEFAULT_PASS: guest
         ports:
-          - 1337
+          - 1337/tcp
+        
+
+
+  test:
+    runs-on: ubuntu-latest
+    env:
+      rabbitMQAddress: amqp://localhost:${{ build.services.rabbitmq.ports[1337] }}
     steps:
       - uses: actions/checkout@v3
-
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
