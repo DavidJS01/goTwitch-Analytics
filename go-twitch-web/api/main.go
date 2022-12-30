@@ -36,7 +36,6 @@ func upsertStreamerHandler(w http.ResponseWriter, r *http.Request, c database.In
 	is_active, _ := strconv.ParseBool(mux.Vars(r)["disable"])
 	err := c(streamer, is_active)
 	if err != nil {
-		fmt.Print("im horny\n")
 		response := upsertResponse(streamer, is_active, 500)
 		json.NewEncoder(w).Encode(response)
 		w.WriteHeader(400)
