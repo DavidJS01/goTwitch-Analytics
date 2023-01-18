@@ -58,17 +58,19 @@ func authenticateClient(connection *websocket.Conn, twitchChannel string) {
 	}
 }
 
-func parseTwitchMessage(message []byte, channel string, connection *websocket.Conn, insertMessage database.InsertMessage) {
+func parseTwitchMessage(message []byte, channel string, connection *websocket.Conn, insertMessage database.InsertMessage) (username string, parsedMessage string) {
 	messageString := string(message)
 	if s.Contains(messageString, "PRIVMSG") {
 		message := parseMessage(messageString)
 		username := parseUserName(messageString)
-		fmt.Printf("%s: %s \n", username, messageString)
-		insertMessage(username, message, channel)
+		// fmt.Printf("%s: %s \n", username, messageString)
+		return username, message
 	}
 	if s.Contains(messageString, "PING") {
 		connection.WriteMessage(websocket.TextMessage, []byte("PONG :tmi.twitch.tv"))
+		
 	}
+	return "", ""
 }
 
 func receiveHandler(connection *websocket.Conn, channel string) {
@@ -78,7 +80,12 @@ func receiveHandler(connection *websocket.Conn, channel string) {
 			log.Println("Error while recieving a twitch message:", err)
 			return
 		} else {
-			parseTwitchMessage(msg, channel, connection, database.InsertTwitchMesasge)
+			parsedUsername, parsedMessage := parseTwitchMessage(msg, channel, connection, database.InsertTwitchMessage)
+			if parsedUsername != "" && parsedMessage != "" {
+				database.InsertStreamer(channel)
+				database.InsertTwitchMessage(parsedUsername, parsedMessage, channel)
+			}
+
 		}
 	}
 }
@@ -90,7 +97,7 @@ func StartStream(twitch_channel string) {
 	}
 	connection, err := createWebSocketClient("irc-ws.chat.twitch.tv:443", "wss")
 	if err != nil {
-		log.Fatalf("Error establishing ws client %s", err)
+		log.Fatalf("Error establishing ws client: %s", err)
 	}
 	authenticateClient(connection, twitch_channel)
 	receiveHandler(connection, twitch_channel)
@@ -98,5 +105,6 @@ func StartStream(twitch_channel string) {
 }
 
 func main() {
+	database.SetupPostgres()
 	StartStream(os.Args[1])
 }
