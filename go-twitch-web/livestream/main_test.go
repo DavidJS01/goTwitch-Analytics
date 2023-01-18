@@ -108,17 +108,33 @@ func TestParseTwitchMessage(t *testing.T) {
 	// create messages to test on
 	mockTwitchMessage := []byte("username!username@username.tmi.twitch.tv PRIVMSG #katevolved :message here")
 	mockPingMessage := []byte("PING server message here")
-	// start testing websocket server
+
+	// start websocket server for testing
 	s := httptest.NewServer(http.HandlerFunc(echo))
 	defer s.Close()
+
 	// create client websocket conn
 	address := z.Split(s.URL, "http://")[1]
 	client, _ := createWebSocketClient(address, "ws")
 
 	// run twitch message test
-	parseTwitchMessage(mockTwitchMessage, "Katevolved", client, mockInsertTwitchMessage)
+	parsedUsername, parsedMessage := parseTwitchMessage(mockTwitchMessage, "Katevolved", client, mockInsertTwitchMessage) // TODO: finish unit test
+	
+	if parsedUsername != "username" {
+		fmt.Print(len(parsedUsername))
+		t.Errorf("Unexpected parsed twitch message, expected username 'username' got %s", parsedUsername)
+	}
+
+	if parsedMessage != "message here" {
+		fmt.Print(len(parsedUsername))
+		t.Errorf("Unexpected parsed twitch message, expected message 'message here' got %s", parsedMessage)
+	}
+
 	// run ping message test
-	parseTwitchMessage(mockPingMessage, "Katevolved", client, mockInsertTwitchMessage)
+	parsedUsername, parsedMessage = parseTwitchMessage(mockPingMessage, "Katevolved", client, mockInsertTwitchMessage)
+	if parsedUsername != "" && parsedMessage != "" {
+		t.Errorf("Expected null parsed username when recieving PING message, got %s, %s", parsedUsername, parsedMessage)
+	}
 
 	_, msg, _ := client.ReadMessage()
 	if string(msg) != "PONG :tmi.twitch.tv" {
