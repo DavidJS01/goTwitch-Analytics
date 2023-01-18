@@ -99,11 +99,6 @@ func StartStream(twitch_channel string) {
 }
 
 func main() {
-	// // database.SetupPostgres()
-	// // database.InsertStreamer("katevolved")
-	// // database.UpsertStreamEvent("katevolved")
-	// database.InsertStreamEventStatus(true, 124, "katevolved")
-	// database.UpdateStreamEventStatus(1234, "katevolved")
-	// StartStream(os.Args[1])
-	database.InsertStreamEventStatus(true, 1, "test")
+	database.SetupPostgres()
+	StartStream(os.Args[1])
 }
