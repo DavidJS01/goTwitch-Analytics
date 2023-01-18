@@ -64,6 +64,7 @@ func parseTwitchMessage(message []byte, channel string, connection *websocket.Co
 		message := parseMessage(messageString)
 		username := parseUserName(messageString)
 		fmt.Printf("%s: %s \n", username, messageString)
+		database.InsertStreamer(channel)
 		insertMessage(username, message, channel)
 	}
 	if s.Contains(messageString, "PING") {
@@ -78,7 +79,7 @@ func receiveHandler(connection *websocket.Conn, channel string) {
 			log.Println("Error while recieving a twitch message:", err)
 			return
 		} else {
-			parseTwitchMessage(msg, channel, connection, database.InsertTwitchMesasge)
+			parseTwitchMessage(msg, channel, connection, database.InsertTwitchMessage)
 		}
 	}
 }
@@ -90,7 +91,7 @@ func StartStream(twitch_channel string) {
 	}
 	connection, err := createWebSocketClient("irc-ws.chat.twitch.tv:443", "wss")
 	if err != nil {
-		log.Fatalf("Error establishing ws client %s", err)
+		log.Fatalf("Error establishing ws client: %s", err)
 	}
 	authenticateClient(connection, twitch_channel)
 	receiveHandler(connection, twitch_channel)
@@ -98,5 +99,11 @@ func StartStream(twitch_channel string) {
 }
 
 func main() {
-	StartStream(os.Args[1])
+	// // database.SetupPostgres()
+	// // database.InsertStreamer("katevolved")
+	// // database.UpsertStreamEvent("katevolved")
+	// database.InsertStreamEventStatus(true, 124, "katevolved")
+	// database.UpdateStreamEventStatus(1234, "katevolved")
+	// StartStream(os.Args[1])
+	database.InsertStreamEventStatus(true, 1, "test")
 }

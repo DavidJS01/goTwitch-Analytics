@@ -27,4 +27,4 @@ RUN superset superset init
 # Switching back to using the `superset` user
 USER root
 USER superset
-RUN superset import-dashboards -p ./gotwitch.zip
+# RUN superset import-dashboards -p ./gotwitch.zip

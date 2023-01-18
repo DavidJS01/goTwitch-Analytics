@@ -30,7 +30,7 @@ This is in effort to continously learn and exit my comfort zones to become a gre
 
 
 ## Disclaimers and Notes
-This project is continously being updated and developed, with architecture and system design improvements being prioritized.
+This project is continously being updated and developed, with architecture and system design improvements being prioritized. *It is not yet fit for consumer use yet*.
 
 Due to budget constraints, this project is locally containerized. In the ideal world, it would be hosted on AWS and be a public facing website. The data architecture would probably just be an RDS instance. 
 
@@ -38,4 +38,6 @@ Top priority development goals:
 1. Redesigned, normalized data models
 2. OAuth handled programatically
 3. MVP front-end UI for a user-friendly, accessible experience
+
+![](assets/readme/goTwitchGanttChart.png)
 

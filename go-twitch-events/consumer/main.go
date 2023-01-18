@@ -13,11 +13,11 @@ func listenStream(stream string) {
 	log.Printf("Connecting to the chat for stream %s", stream)
 	// https://serverfault.com/a/903631
 	cmd := exec.Command("sh", "-c", fmt.Sprintf("echo $$; exec ./stream %s", stream))
+	database.InsertStreamEventStatus(true, cmd.Process.Pid, stream)
 	err := cmd.Start()
 	if err != nil {
 		log.Print(err)
 	}
-	database.InsertStreamEvent(stream, true, cmd.Process.Pid)
 }
 
 func main() {
@@ -63,27 +63,29 @@ func main() {
 			log.Printf(" > Received message: %s\n", message.Body)
 			command := string(message.Body)
 			if s.Contains(command, "start") {
+				// if the string contains the start command, call listenStream
 				stream := s.Split(command, " ")[1]
-				err := database.InsertStreamer(stream, true)
-				if err != nil {
-					log.Print(err)
-				}
 				listenStream(stream)
 			}
 			if s.Contains(command, "stop") {
+				// parse stream name from message
 				stream := s.Split(command, " ")[1]
+				// get the latest PID used to listen to that stream
 				pid := database.GetLatestPID(stream)
+
+				// kill the process associated with that PID
 				cmd := exec.Command("kill", fmt.Sprint(pid))
 				err := cmd.Run()
 				if err != nil {
 					log.Print(err)
 				}
-				err = cmd.Wait()
-				if err != nil {
-					log.Print(err)
-				}
-				database.InsertStreamEvent(stream, false, pid)
-				err = database.InsertStreamer(stream, false)
+				// err = cmd.Wait()
+				// if err != nil {
+				// 	log.Print(err)
+				// }
+
+				// update the stream events status table and mark listening as false
+				database.UpdateStreamEventStatus(pid, stream)
 				if err != nil {
 					log.Print(err)
 				}

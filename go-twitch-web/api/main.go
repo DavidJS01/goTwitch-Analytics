@@ -2,50 +2,44 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	// "io/ioutil"
-	// "log"
+	"log"
 	"net/http"
 	// s "strings"
 
 	// "html/template"
-	"strconv"
+	// "strconv"
 
 	"github.com/gorilla/mux"
 	"test.com/m/internal/database"
 )
 
-type Upsert struct {
-	Streamer    string `json:"streamer"`
-	Is_Active   bool   `json:"is_active"`
-	Status_Code int    `json:"status_code"`
-}
-
-func upsertResponse(streamer string, is_active bool, status_code int) Upsert {
-	var response Upsert
-	response.Streamer = streamer
-	response.Is_Active = is_active
-	response.Status_Code = status_code
-
-	return response
-}
-
-func upsertStreamerHandler(w http.ResponseWriter, r *http.Request, c database.InsertStreamerAPI) {
+func upsertStreamerHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	streamer := mux.Vars(r)["stream"]
-	is_active, _ := strconv.ParseBool(mux.Vars(r)["disable"])
-	err := c(streamer, is_active)
-	if err != nil {
-		response := upsertResponse(streamer, is_active, 500)
-		json.NewEncoder(w).Encode(response)
-		w.WriteHeader(400)
+	err := database.UpsertStreamEvent(streamer)
+	log.Print(err)
+	if err == nil {
+		w.WriteHeader(200)
 		return
-	} else {
-		response := upsertResponse(streamer, is_active, 200)
-		json.NewEncoder(w).Encode(response)
-		w.WriteHeader(300)
 	}
+	if err != nil {
+		http.Error(w, "Error while adding a stream event", http.StatusInternalServerError)
+	}
+}
 
+func addStreamerHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	streamer := mux.Vars(r)["stream"]
+	log.Print(streamer)
+	err := database.InsertStreamer(streamer)
+	if err == nil {
+		w.WriteHeader(200)
+		return
+	}
+	if err != nil {
+		http.Error(w, "Error while adding a streamer", http.StatusInternalServerError)
+	}
 }
 
 func listStreamersHandler(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +47,6 @@ func listStreamersHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Print(x)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(x)
 }
@@ -69,9 +62,10 @@ func main() {
 	mux := mux.NewRouter().StrictSlash(true)
 	mux.HandleFunc("/about", homeHandler)
 	mux.HandleFunc("/stream/upsert", func(w http.ResponseWriter, r *http.Request) {
-		upsertStreamerHandler(w, r, database.InsertStreamer)
-	}).Queries("stream", "{stream}", "disable", "{disable}").Methods("POST")
+		upsertStreamerHandler(w, r)
+	}).Queries("stream", "{stream}").Methods("POST")
 	mux.HandleFunc("/stream/list", listStreamersHandler).Methods("GET")
-	http.ListenAndServe(":1334", mux)
+	mux.HandleFunc("/stream/add", addStreamerHandler).Queries("stream", "{stream}").Methods("POST")
+	http.ListenAndServe(":8080", mux)
 
 }

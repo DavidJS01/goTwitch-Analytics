@@ -14,23 +14,23 @@ services:
     networks:
       - dev-network
   
-  # superset:
-  #   build:
-  #     context: .
-  #     dockerfile: ./docker/superset/Dockerfile
-  #   ports:
-  #     - '8088:8088'
-  #   expose:
-  #     - '8088'
-  #   volumes:
-  #     - superset-data:/var/lib/superset
-  #   extra_hosts:
-  #       - "pghost:172.17.0.1"
-  #   networks:
-  #     - dev-network
+  superset:
+    build:
+      context: .
+      dockerfile: ./docker/superset/Dockerfile
+    ports:
+      - '8088:8088'
+    expose:
+      - '8088'
+    volumes:
+      - superset-data:/var/lib/superset
+    extra_hosts:
+        - "pghost:172.17.0.1"
+    networks:
+      - dev-network
   
-  server:
-    container_name: server
+  go_twitch_server:
+    container_name: go_twitch_server
     build:
       context: .
       dockerfile: ./docker/web_server/Dockerfile
