@@ -22,7 +22,6 @@ const (
 
 type InsertMessage func(username string, message string, channel string)
 
-
 func InsertTwitchMessage(username string, message string, channel string) {
 	db := connectToDB()
 	sqlStatement := `
@@ -229,7 +228,6 @@ func InsertStreamEventStatus(listening bool, pid int, twitchChannel string) erro
 	return err
 }
 
-
 func GetStreamerData() ([]Streamer, error) {
 	streamers := []Streamer{}
 	db := connectToDB()
@@ -257,8 +255,6 @@ func GetStreamerData() ([]Streamer, error) {
 	return streamers, err
 
 }
-
-
 
 func GetLatestPID(streamer string) int {
 	db := connectToDB()

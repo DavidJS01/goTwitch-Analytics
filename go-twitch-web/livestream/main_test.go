@@ -119,7 +119,7 @@ func TestParseTwitchMessage(t *testing.T) {
 
 	// run twitch message test
 	parsedUsername, parsedMessage := parseTwitchMessage(mockTwitchMessage, "Katevolved", client, mockInsertTwitchMessage) // TODO: finish unit test
-	
+
 	if parsedUsername != "username" {
 		fmt.Print(len(parsedUsername))
 		t.Errorf("Unexpected parsed twitch message, expected username 'username' got %s", parsedUsername)
