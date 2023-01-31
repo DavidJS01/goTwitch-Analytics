@@ -70,6 +70,7 @@ func main() {
 			if s.Contains(command, "stop") {
 				// parse stream name from message
 				stream := s.Split(command, " ")[1]
+
 				// get the latest PID used to listen to that stream
 				pid := database.GetLatestPID(stream)
 
@@ -79,10 +80,6 @@ func main() {
 				if err != nil {
 					log.Print(err)
 				}
-				// err = cmd.Wait()
-				// if err != nil {
-				// 	log.Print(err)
-				// }
 
 				// update the stream events status table and mark listening as false
 				database.UpdateStreamEventStatus(pid, stream)
