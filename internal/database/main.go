@@ -34,15 +34,6 @@ func InsertTwitchMessage(username string, message string, channel string) {
 	}
 }
 
-func newNullString(pid int) sql.NullInt64 {
-	if pid == 0 {
-		return sql.NullInt64{}
-	}
-	return sql.NullInt64{
-		Int64: int64(pid),
-		Valid: true,
-	}
-}
 
 func connectToDB() *sql.DB {
 	psqlInfo := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable",
@@ -50,7 +41,8 @@ func connectToDB() *sql.DB {
 		password,
 		host,
 		port,
-		dbname)
+		dbname,
+	)
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
@@ -118,7 +110,6 @@ func createStreamerTable() {
 		create table if not exists twitch.twitch_channels  (
 			twitch_channel varchar primary key
 		);
-		
 	`
 	_, err := db.Exec(sqlStatement)
 	if err != nil {

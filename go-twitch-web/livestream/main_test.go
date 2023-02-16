@@ -99,7 +99,6 @@ func TestAuthenticateClient(t *testing.T) {
 	if string(msg) != "JOIN #twitch_channel_here" {
 		t.Errorf("expected to recieve JOIN #twitch_channel_here, got %s", string(msg))
 	}
-
 }
 
 func mockInsertTwitchMessage(username string, message string, channel string) {}

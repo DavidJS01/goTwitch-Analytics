@@ -2,14 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	// "io/ioutil"
 	"log"
 	"net/http"
-	// s "strings"
-
-	// "html/template"
-	// "strconv"
-
 	"github.com/gorilla/mux"
 	"test.com/m/internal/database"
 )
@@ -43,17 +37,16 @@ func addStreamerHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func listStreamersHandler(w http.ResponseWriter, r *http.Request) {
-	x, err := database.GetStreamerData()
+	streamerData, err := database.GetStreamerData()
 	if err != nil {
 		panic(err)
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(x)
+	json.NewEncoder(w).Encode(streamerData)
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "assets/index.html")
-
 }
 
 func main() {

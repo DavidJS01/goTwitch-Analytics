@@ -23,5 +23,5 @@ FROM scratch
 # to root folder of scratch container.
 COPY --from=builder ["/build/main", "/"]
 
-# Command to run when starting the container.
+# Run ./main on start.
 ENTRYPOINT ["/main"]

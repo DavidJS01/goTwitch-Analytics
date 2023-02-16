@@ -12,7 +12,9 @@ import (
 func listenStream(stream string) {
 	log.Printf("Connecting to the chat for stream %s", stream)
 	// https://serverfault.com/a/903631
+	// start listening to the stream
 	cmd := exec.Command("sh", "-c", fmt.Sprintf("echo $$; exec ./stream %s", stream))
+	// insert stream event status with listening bool, pid, and stream name
 	database.InsertStreamEventStatus(true, cmd.Process.Pid, stream)
 	err := cmd.Start()
 	if err != nil {
@@ -21,9 +23,10 @@ func listenStream(stream string) {
 }
 
 func main() {
-
+	// connect to rabbitmq
 	rabbitMQConnection := mq.ConnectToRabbitMQ()
 	defer rabbitMQConnection.Close()
+	// connect to rabbitmq channel
 	rabbitMQChannel := mq.ConnectToRabbitMQChannel(rabbitMQConnection)
 	_, err := rabbitMQChannel.QueueDeclare(
 		"Streams", // queue name
@@ -38,7 +41,7 @@ func main() {
 	}
 	defer rabbitMQChannel.Close()
 
-	// Subscribing to Streams for getting messages.
+	// Subscribe to Streams for consuming messages.
 	messages, err := rabbitMQChannel.Consume(
 		"Streams", // queue name
 		"",        // consumer
@@ -61,7 +64,9 @@ func main() {
 	go func() {
 		for message := range messages {
 			log.Printf(" > Received message: %s\n", message.Body)
+			// convert event's message.Body into string, either "start" or "stop"
 			command := string(message.Body)
+
 			if s.Contains(command, "start") {
 				// if the string contains the start command, call listenStream
 				stream := s.Split(command, " ")[1]

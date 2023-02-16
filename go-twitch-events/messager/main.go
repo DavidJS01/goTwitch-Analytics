@@ -16,8 +16,11 @@ type MessageResponse struct {
 }
 
 func WriteMessage(body []byte) error {
+	// connect to rabbitmq
 	rabbitMQConnection := mq.ConnectToRabbitMQ()
 	defer rabbitMQConnection.Close()
+	
+	// connect to rabbitmq channel
 	rabbitMQChannel := mq.ConnectToRabbitMQChannel(rabbitMQConnection)
 	defer rabbitMQChannel.Close()
 
