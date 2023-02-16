@@ -6,24 +6,24 @@ import (
 )
 
 func ConnectToRabbitMQ() *amqp.Connection {
-	// Define RabbitMQ server URL.
-	amqpServerURL := os.Getenv("AMQP_SERVER_URL") //@TODO add this
+	// Get rabbitMQ server url from env
+	amqpServerURL := os.Getenv("AMQP_SERVER_URL")
 
-	// Create a new RabbitMQ connection.
-	connectRabbitMQ, err := amqp.Dial(amqpServerURL)
+	// Create a new RabbitMQ connection
+	rabbitMQConnection, err := amqp.Dial(amqpServerURL)
 	if err != nil {
 		panic(err)
 	}
-	return connectRabbitMQ
+	return rabbitMQConnection
 
 }
 
 func ConnectToRabbitMQChannel(connectRabbitMQ *amqp.Connection) *amqp.Channel {
-	channelRabbitMQ, err := connectRabbitMQ.Channel()
+	channelConnection, err := connectRabbitMQ.Channel()
 	if err != nil {
 		panic(err)
 	}
-	return channelRabbitMQ
+	return channelConnection
 }
 
 func CreateMessage(body []byte) amqp.Publishing {

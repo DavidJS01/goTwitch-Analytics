@@ -13,11 +13,11 @@ RUN go mod download
 COPY . .
 
 # Set necessary environment variables needed 
-# for our image and build the consumer.
+# and build the consumer.
 ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
 RUN go build -o main ./go-twitch-events/consumer/main.go
 
 RUN go build -o stream ./go-twitch-web/livestream/main.go
 
-# Command to run when starting the container.
+# Run ./main on start.
 ENTRYPOINT ["./main"]

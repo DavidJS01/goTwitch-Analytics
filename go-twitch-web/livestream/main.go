@@ -31,7 +31,7 @@ func createWebSocketClient(host string, scheme string) (*websocket.Conn, error) 
 	log.Print("Creating websocket client")
 	u := url.URL{Scheme: scheme, Host: host}
 	log.Printf("connecting to %s", u.String())
-
+	// create websocket client
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func parseTwitchMessage(message []byte, channel string, connection *websocket.Co
 
 func receiveHandler(connection *websocket.Conn, channel string) {
 	for {
-		// get a message
+		// read a message
 		_, msg, err := connection.ReadMessage()
 		if err != nil {
 			log.Println("Error while recieving a twitch message:", err)
@@ -86,7 +86,7 @@ func receiveHandler(connection *websocket.Conn, channel string) {
 		} else {
 			// parse message for username and twitch chat message
 			parsedUsername, parsedMessage := parseTwitchMessage(msg, channel, connection, database.InsertTwitchMessage)
-			// if the message contained a username and message, insert content into postgres
+			// if the message contained a username and twitch message, insert content into postgres
 			if parsedUsername != "" && parsedMessage != "" {
 				database.InsertStreamer(channel)
 				database.InsertTwitchMessage(parsedUsername, parsedMessage, channel)
